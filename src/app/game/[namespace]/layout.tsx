@@ -35,7 +35,7 @@ export default function GameLayout({children}: { children: ReactNode}) {
             setRadios(res.radios)
             setStart(res.start)
 
-            router.replace(path + '/game')
+            router.replace(path + '/play')
         })
 
         return () => {
@@ -54,7 +54,7 @@ export default function GameLayout({children}: { children: ReactNode}) {
         case 'connected':
             return (
                 <RadioContext.Provider value={{radios, start}}>
-                    children
+                    {children}
                 </RadioContext.Provider>
             );
         case 'error':

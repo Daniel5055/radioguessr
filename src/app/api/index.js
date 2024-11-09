@@ -185,7 +185,8 @@ io.on('connection', (socket) => {
         }
     });
 
-    socket.on("START", ({lobby: lobbyId}) => {
+    socket.on("START", async ({lobby: lobbyId}) => {
+        console.log('start')
         const keys = Object.keys(countries);
         let valid_country = false;
 
@@ -193,10 +194,10 @@ io.on('connection', (socket) => {
             const code = keys[keys.length * Math.random() << 0];
             const country = countries[code];
     
-            fetch("http://radio.garden/api/search?q=" + country).then((res) => res.json()).then((body) => {
+            await fetch("http://radio.garden/api/search?q=" + country).then((res) => res.json()).then(async (body) => {
                 const visitUrl = body.hits.hits[0]._source.url;
                 const countryAPIUrl = "http://radio.garden/api/ara/content/page/" + visitUrl.split('/').at(-1);
-                fetch(countryAPIUrl).then((res) => res.json()).then((body) => {
+                await fetch(countryAPIUrl).then((res) => res.json()).then((body) => {
                     const stations = body.data.content[0].items
                     let urls = stations.map(s => s.page.url.split('/'))
                     urls = urls.map(u => "http://radio.garden/api/ara/content/" + u[1] + "/" + u.at(-1) + "/channel.mp3")
