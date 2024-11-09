@@ -9,11 +9,6 @@ export default function GameLayout({children}: { children: ReactNode}) {
             socket.connect()
 
             socket.once('connect', () => {
-                const id: IdMessageClient = {
-                    id: null,
-                    name: null,
-                }
-                socket.emit('ID', id)
                 setConnectionStatus('connected')
             })
         }
