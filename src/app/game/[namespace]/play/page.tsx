@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useParams } from "next/navigation"
 import Globe from "./Globe";
 import { Country } from "@/types/country";
@@ -7,10 +7,12 @@ import { Radio } from "./Radio";
 import CountryFlag from "../../../../components/ui/CountryFlag";
 import PollLeaderboard from "./PollLeaderboard";
 import { Countdown } from "./Countdown";
+import RadioContext from "@/utils/RadioContext";
+import socket from "@/utils/socket";
 
 function GamePage() {
     const router = useParams();
-    const { namespace } = router;
+    const radioInfo = useContext(RadioContext)
 
     const [selectedCountry, setSelectedCountry] = useState<Country | null>(null);
     const [leaderboard, setLeaderboard] = useState<Record<string, number>>({
@@ -19,6 +21,27 @@ function GamePage() {
         'MX': 6,
         'BR': 2,
     });
+
+    if (radioInfo == null) {
+      return <p>Waiting for radio info</p>
+    }
+
+    function onVote(country: string) {
+      const req: VoteMessageClient = { country, lobby: router.namespace as string };
+      socket.emit('VOTE', req)
+      console.log('emit VOTE')
+    }
+
+    function selectCountry(country: Country) {
+      onVote(country.alpha2)
+      setSelectedCountry(country)
+    }
+
+    useEffect(() => {
+      socket.on('POLLS', (res: PollsMessageServer) => {
+        setLeaderboard(res.votes)
+      })
+    }, [])
 
     return (
         <div className="flex flex-col overflow-y-hidden h-[100vh] relative">
@@ -30,11 +53,11 @@ function GamePage() {
                     <PollLeaderboard leaderboard={leaderboard} alpha2={selectedCountry?.alpha2} />
                 </div>
             </div>
-            <Globe onSelectCountry={setSelectedCountry} />
+            <Globe onSelectCountry={selectCountry} />
             <div className="absolute bottom-0 left-0 right-0 p-4">
                 <div className="flex gap-x-2 relative">
                     <div className="flex-1">
-                        <Radio urls={["https://radio.garden/api/ara/content/listen/FhL85inn/channel.mp3"]} />
+                        <Radio urls={radioInfo.radios} start={radioInfo.start} />
                     </div>
                     <Countdown duration={100} />
                 </div>

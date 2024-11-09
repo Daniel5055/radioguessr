@@ -100,7 +100,7 @@ And the server sends the following message back
 ```ts
 "START"
 {
-    radio: string[] // All radio urls
+    radios: string[] // All radio urls
     start: number // Index of starting radio
 }
 ```
