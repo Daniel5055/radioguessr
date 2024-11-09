@@ -1,8 +1,22 @@
+"use client";
+import { useState } from "react";
+import { useParams } from "next/navigation"
+import Globe from "./Globe";
+import { Country } from "@/types/country";
 
-export default function Game({ params: { namespace } }: { params: { namespace: string } }) {
-  return (
-    <div className="flex flex-col items-center justify-center h-screen bg-background text-foreground gap-10">
-      <h1 className="text-4xl font-bold">Game {namespace}</h1>
-    </div>
-  );
+function GamePage() {
+    const router = useParams();
+    const { namespace } = router;
+
+    const [selectedCountry, setSelectedCountry] = useState<Country | null>(null);
+
+    return (
+        <div className="flex flex-col overflow-y-hidden h-[100vh]">
+            <h1>country: {selectedCountry?.name}</h1>
+            <p>Namespace: {namespace}</p>
+            <Globe onSelectCountry={setSelectedCountry} />
+        </div>
+    )
 }
+
+export default GamePage

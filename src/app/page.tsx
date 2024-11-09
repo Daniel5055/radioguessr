@@ -1,9 +1,24 @@
-"use client";
+"use client"
 
+import { API_PATH } from "@/utils/api";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button"
 import DifficultyToggle from "@/components/ui/shared/difficulty-toggle"
 
 export default function Home() {
+  const router = useRouter()
+
+  function onCreate() {
+    fetch(`${API_PATH}/create`, {
+      method: "POST"
+    }).then((res) => {
+      return res.json()
+    }
+    ).then((data: CreateLobbyResponse) => {
+      router.push(data.url)
+    })
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white" style={{backgroundImage: 'url(/bg.png)', backgroundSize: 'cover', backgroundPosition: 'center'}}>
 
@@ -16,7 +31,7 @@ export default function Home() {
         <div className="flex flex-col items-center space-y-20 mt-20">
           <DifficultyToggle />
 
-          <Button className="bg-primary hover:bg-hover text-white font-bold py-3 px-6 rounded-full text-lg transition-colors duration-300">
+          <Button onClick={onCreate} className="bg-primary hover:bg-hover text-white font-bold py-3 px-6 rounded-full text-lg transition-colors duration-300">
             Create Lobby
           </Button>
         </div>
