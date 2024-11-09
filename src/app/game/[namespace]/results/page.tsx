@@ -1,30 +1,94 @@
 "use client"
 
-import { useParams } from "next/navigation";
+import { motion } from 'framer-motion';
+import { useCallback, useState } from "react";
+import countries from "@/assets/countries.json";
 
-export default function Game() {
-  const params = useParams()
+import CountryFlag from "@/components/ui/CountryFlag";
+import PollLeaderboard from '../play/PollLeaderboard';
+
+import React from "react";
+import Particles from "react-tsparticles";
+import { loadConfettiPreset } from "tsparticles-preset-confetti";
+
+export default function ResultsPage() {
+  const [countryCode] = useState<string>("GB");
+  const [winner] = useState<number>(1);
+
+  const [leaderboard1] = useState<Record<string, number>>({
+    'US': 10,
+    'CA': 8,
+    'MX': 6,
+    'BR': 2,
+  });
+  const [leaderboard2] = useState<Record<string, number>>({
+    'US': 5,
+    'CA': 3,
+    'MX': 2,
+    'BR': 1,
+  });
+
+  const particlesInit = useCallback(async (engine: any) => {
+    // Load the confetti preset
+    await loadConfettiPreset(engine);
+  }, []);
+
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-background text-foreground gap-10">
-      <h1 className="text-4xl font-bold">Results for game {params.namespace}</h1>
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <h2 className="text-2xl font-bold">Team 1</h2>
-          <ul>
-            <li>Player 1</li>
-            <li>Player 2</li>
-            <li>Player 3</li>
-          </ul>
+    <div className="min-h-svh flex flex-col bg-slate-800 px-4 py-8 text-white">
+      <h1 className="text-white text-4xl font-semibold mb-4">Results</h1>
+
+      <Particles
+        id="confetti-particles"
+        init={particlesInit}
+        options={{
+          preset: "confetti", // Use the confetti preset
+          fullScreen: {
+            enable: true,   // Makes the particles cover the entire screen
+            zIndex: 1       // Adjusts layering; higher z-index puts particles above other elements
+          },
+          delay: 5
+        }}
+      />
+
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5 }}
+        className='pb-8'
+      >
+        <h2 className="font-semibold text-gray-100">The Country of Origin was...</h2>
+        <div className="flex items-center gap-x-2">
+          <h3 className="text-white text-2xl font-semibold">{(countries as any)[countryCode]}</h3>
+          <CountryFlag alpha2={countryCode} />
         </div>
-        <div>
-          <h2 className="text-2xl font-bold">Team 2</h2>
-          <ul>
-            <li>Player 4</li>
-            <li>Player 5</li>
-            <li>Player 6</li>
-          </ul>
+      </motion.div>
+
+      <motion.div
+        initial={{ opacity: 0, x: -100 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.5, delay: 5 }}
+        className='py-8 border-t'
+      >
+        <h2 className="font-semibold text-gray-100">and the Winning Team is...</h2>
+        <div className="flex items-center gap-x-2">
+          <h3  className="text-white text-2xl font-semibold">
+            {winner === 0 ? "The Red Team" : "The Blue Team"}
+          </h3>
         </div>
-      </div>
+      </motion.div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 100 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 10 }}
+        className="py-8 border-t"
+      >
+        <h2 className="font-semibold text-gray-100">Red Team Votes</h2>
+        <PollLeaderboard leaderboard={leaderboard1} color={'red'} />
+
+        <h2 className="font-semibold text-gray-100 mt-8">Blue Team Votes</h2>
+        <PollLeaderboard leaderboard={leaderboard2} color={'blue'} />
+      </motion.div>
     </div>
   );
 }
