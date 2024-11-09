@@ -21,10 +21,10 @@ export default {
   				foreground: 'hsl(var(--popover-foreground))'
   			},
   			primary: {
-  				DEFAULT: 'hsl(var(--primary))',
-  				foreground: 'hsl(var(--primary-foreground))'
+  				DEFAULT: 'var(--primary)',
+  				foreground: 'hsl(var(--primary))'
   			},
-			hover: 'hsl(var(--hover))',
+			hover: 'var(--hover)',
   			secondary: {
   				DEFAULT: 'hsl(var(--secondary))',
   				foreground: 'hsl(var(--secondary-foreground))'
