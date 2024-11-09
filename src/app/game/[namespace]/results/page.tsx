@@ -5,7 +5,7 @@ import { useCallback, useContext } from "react";
 import countries from "@/assets/countries.json";
 
 import CountryFlag from "@/components/ui/CountryFlag";
-import PollLeaderboard from '../play/PollLeaderboard';
+import PollLeaderboardResults from './PollLeaderboardResults';
 
 import React from "react";
 import Particles from "react-tsparticles";
@@ -76,12 +76,12 @@ export default function ResultsPage() {
       >
         <div className="flex flex-col justify-start items-start relative">
           <h2 className="font-semibold text-gray-100">Red Team Votes</h2>
-          <PollLeaderboard leaderboard={results.votes[0]} color={'red'} />
+          <PollLeaderboardResults leaderboard={results.votes[0]} color={'red'} />
         </div>
 
         <div className='flex flex-col justify-start items-start relative'>
           <h2 className="font-semibold text-gray-100 mt-8">Blue Team Votes</h2>
-          <PollLeaderboard leaderboard={results.votes[1]} color={'blue'} />
+          <PollLeaderboardResults leaderboard={results.votes[1]} color={'blue'} />
         </div>
       </motion.div>
     </div>
