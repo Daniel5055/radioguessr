@@ -8,10 +8,11 @@ import { FaChevronLeft, FaChevronRight, FaPause, FaPlay } from "react-icons/fa";
 
 export interface RadioProps {
     urls: string[];
+    start: number
 }
 
-export const Radio: React.FC<RadioProps> = ({ urls }) => {
-    const [urlIndex, setUrlIndex] = useState(0);
+export const Radio: React.FC<RadioProps> = ({ urls, start }) => {
+    const [urlIndex, setUrlIndex] = useState(start);
     const [volume, setVolume] = useState(1);
     
     const audioRef = useRef<HTMLAudioElement>(null);
@@ -38,22 +39,22 @@ export const Radio: React.FC<RadioProps> = ({ urls }) => {
     }, [volume]);
 
     return (
-        <div className="flex flex-col md:flex-row gap-x-2 gap-y-4 md:items-center bg-slate-800 p-2 rounded-lg shadow-lg border border-slate-500 w-full">
+        <div className="flex flex-col md:flex-row gap-x-2 gap-y-4 md:items-center bg-slate-800 p-4 rounded-lg shadow-lg border border-slate-500 w-full items-center">
             <div className="flex gap-x-2 items-center">
-            {isPlaying ? (
-                <Button onClick={pause}>
-                    <FaPause />
-                </Button> ) : (
-                <Button onClick={play}>
-                    <FaPlay />
+                {isPlaying ? (
+                    <Button onClick={pause}>
+                        <FaPause />
+                    </Button> ) : (
+                    <Button onClick={play}>
+                        <FaPlay />
+                    </Button>
+                )}
+                <Button onClick={() => setUrlIndex((urlIndex - 1 + urls.length) % urls.length)}>
+                    <FaChevronLeft />
                 </Button>
-            )}
-            <Button onClick={() => setUrlIndex((urlIndex - 1 + urls.length) % urls.length)}>
-                <FaChevronLeft />
-            </Button>
-            <Button onClick={() => setUrlIndex((urlIndex + 1) % urls.length)}>
-                <FaChevronRight />
-            </Button>
+                <Button onClick={() => setUrlIndex((urlIndex + 1) % urls.length)}>
+                    <FaChevronRight />
+                </Button>
             </div>
             <Slider
                 value={[volume]}

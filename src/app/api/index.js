@@ -43,9 +43,10 @@ app.post('/create', (req, res) => {
     const lobbyId = crypto.randomBytes(4).toString('hex');
     
     lobbies[lobbyId] = {
-        masterId: null,
+        masterId: -1,
         players: [],
         max_guesses: 1, // change later?
+        correct: null,
     };
 
     res.json({
@@ -59,6 +60,7 @@ class Player {
         this.username = name;
         this.team = team;
         this.guesses = [];
+        this.interval = -1;
     }
 }
 
@@ -110,7 +112,7 @@ function getVotesByTeam(players) {
 
     players.forEach(player => {
         if (player.team === 0) {
-            players.guesses.forEach(guess => {
+            player.guesses.forEach(guess => {
                 if (votes[0].hasOwnProperty(guess)) {
                     votes[0][guess] += 1
                 } else {
@@ -119,7 +121,7 @@ function getVotesByTeam(players) {
             })
         } else if (player.team === 1) {
             
-            players.guesses.forEach(guess => {
+            player.guesses.forEach(guess => {
                 if (votes[1].hasOwnProperty(guess)) {
                     votes[1][guess] += 1
                 } else {
@@ -129,9 +131,28 @@ function getVotesByTeam(players) {
         }
     });
 
-    return teamSize;
+    return votes;
 }
 
+function getWinner(players, correct) {
+    let votes = getVotesByTeam(players);
+    let zeroVal;
+    let oneVal;
+    if (correct in votes[0]) {
+        zeroVal = votes[0][correct]
+    }
+
+    if (correct in votes[1]) {
+        oneVal = votes[1][correct]
+    }
+
+    if (zeroVal != -1 && oneVal != -1) {
+        return zeroVal > oneVal ? 0 : zeroVal == oneVal ? -1 : 1
+    } 
+    if (zeroVal != -1) return 0;
+    if (oneVal != -1) return 1;
+    return null;
+}
 
 io.on('connection', (socket) => {
     console.log(`a user (${socket.id}) joined`);
@@ -144,6 +165,9 @@ io.on('connection', (socket) => {
             if (player) {
                 socket.join(lobbyId);
                 player.id = socket.id;
+
+                clearTimeout(player.interval); // stop them from being deleted
+                player.interval = -1;
                 socket.emit("ID", {
                     id: player.id,
                     name: player.username,
@@ -160,7 +184,7 @@ io.on('connection', (socket) => {
                 const team = team_sizes[0] > team_sizes[1] ? 1 : 0;
                 const newPlayer = new Player(socket.id, genName(), team);
 
-                if (lobby.players.length == 0) {
+                if (lobby.players.length == 0 || lobby.masterId == -1) {
                     lobby.masterId = socket.id;
                 }
 
@@ -180,13 +204,19 @@ io.on('connection', (socket) => {
                 });
 
                 console.log(`Player joined the lobby ${lobbyId} as ${newPlayer.username}`);
+
+                socket.broadcast.to(lobbyId).emit("PLAYER_IN", {
+                    name: newPlayer.username,
+                    team : newPlayer.team
+                })
             }
         } else {
             socket.disconnect(true);
         }
     });
 
-    socket.on("START", ({lobby: lobbyId}) => {
+    socket.on("START", async ({lobby: lobbyId}) => {
+        console.log('start')
         const keys = Object.keys(countries);
         let valid_country = false;
 
@@ -194,21 +224,20 @@ io.on('connection', (socket) => {
             const code = keys[keys.length * Math.random() << 0];
             const country = countries[code];
     
-            fetch("http://radio.garden/api/search?q=" + country).then((res) => res.json()).then((body) => {
+            await fetch("http://radio.garden/api/search?q=" + country).then((res) => res.json()).then(async (body) => {
                 const visitUrl = body.hits.hits[0]._source.url;
                 const countryAPIUrl = "http://radio.garden/api/ara/content/page/" + visitUrl.split('/').at(-1);
-                fetch(countryAPIUrl).then((res) => res.json()).then((body) => {
+                await fetch(countryAPIUrl).then((res) => res.json()).then((body) => {
                     const stations = body.data.content[0].items
                     let urls = stations.map(s => s.page.url.split('/'))
                     urls = urls.map(u => "http://radio.garden/api/ara/content/" + u[1] + "/" + u.at(-1) + "/channel.mp3")
                     valid_country = urls.length >= 5;
+                    if (valid_country) {
+                        urls = getRandom(urls, 5);
+                        lobbies[lobbyId].correct = code;
+                        startGame(lobbyId, urls, code)
+                    }
 
-                    urls = getRandom(urls, 5);
-
-                    io.to(lobbyId).emit("START", {
-                        radio: urls,
-                        start: 2
-                    })
                 })
             })
         }
@@ -219,7 +248,7 @@ io.on('connection', (socket) => {
         if (lobby) {
             const player = lobby.players.find((p) => p.id == socket.id);
             if (player) {
-                if (player.guesses.length = max_guesses) {
+                if (player.guesses.length = lobbies[lobbyId].max_guesses) {
                     player.guesses.shift();
                 }
                 player.guesses.push(country);
@@ -233,15 +262,64 @@ io.on('connection', (socket) => {
         
 
     socket.on('disconnect', () => {
-        // if user is lobby master, assign different
-        console.log(`a user (${socket.id}) disconnected`);
+        // for (const [lobbyId, details] of Object.entries(lobbies)) {
+        //     if (socket.id == details.masterId) {
+        //         let validMaster = false;
+        //         while (!validMaster) {
+        //             let pl = getRandom(details.players, 1);
+        //             if (pl) {
+        //                 if (pl.interval != -1) {
+        //                     validMaster = true;
+        //                     lobbies[lobbyId].masterId = pl.id;
+        //                 }
+        //             } else {
+        //                 console.log("No valid master found")
+        //                 lobbies[lobbyId].masterId = -1;
+        //                 validMaster = true;
+        //             }
+        //         }
+
+        //         let player = details.players.find(pl => pl.id = socket.id);
+        //         socket.to(lobbyId).emit("PLAYER_OUT", {
+        //             name: player.username,
+        //             team : player.team
+        //         })
+        //         setTimeout((() => {
+        //             let index = details.players.indexOf(player)
+        //             lobbies[lobbyId].players.splice(index, 1)
+        //             console.log(`a user (${socket.id}) disconnected`)
+        //             clearInterval(this)
+        //         }), 5000) // remove player in some time
+        //     }
+        // }
     })
 })
 
-const INTERVAL = 16;
+function startGame(lobbyId, urls, country) {
+    io.to(lobbyId).emit("START", {
+        radios: urls,
+        start: 2
+    })
 
-function gameloop() {
+    const polling = setInterval(() => {
+        const votes = getVotesByTeam(lobbies[lobbyId].players)
+        for (const player of lobbies[lobbyId].players) {
+            io.to(player.id).emit('POLLS', {
+                votes: votes[player.team] ?? {}
+            })
+        }
+    }, 2000)
 
+
+    setTimeout(() => {
+        clearInterval(polling);
+
+        const votes = getVotesByTeam(lobbies[lobbyId].players)
+
+        io.to(lobbyId).emit('RESULT', {
+            country,
+            votes,
+            winner: getWinner(lobbies[lobbyId].players, lobbies[lobbyId].correct),
+        })
+    }, 100000)
 }
-
-setInterval(gameloop, INTERVAL);

@@ -11,7 +11,7 @@ const Navbar = () => {
           <div className="flex items-center justify-between">
             <Link className="flex items-center space-x-2" href='/'>
               <Radio className="h-8 w-8 text-primary" />
-              <h1 className="text-3xl font-bold">RadioGuessr</h1>
+              <h1 className="text-3xl font-bold text-foreground">RadioGuessr</h1>
             </Link>
           </div>
           {/* <nav className="flex gap-4">

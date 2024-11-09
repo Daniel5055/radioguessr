@@ -9,6 +9,10 @@ export interface IdMessageClient {
     lobby: string
 }
 
+export interface StartMessageClient {
+    lobby: string
+}
+
 export interface IdMessageServer {
     name: string
     id: string
@@ -31,15 +35,16 @@ export interface PlayerOutMessageServer {
 }
 
 export interface StartMessageServer {
-    radio: string[]
+    radios: string[]
     start: number
 }
 
 export interface VoteMessageClient {
     country: string
+    lobby: string
 }
 
-export interface PollsMessageClient {
+export interface PollsMessageServer {
     votes: Record<string, number>
 }
 
