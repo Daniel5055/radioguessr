@@ -1,13 +1,19 @@
-import { redirect } from "next/navigation";
+"use client"
+
+import { API_PATH } from "@/utils/api";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
+  const router = useRouter()
+
   function onCreate() {
-    fetch("/api/create", {
+    fetch(`${API_PATH}/create`, {
       method: "POST"
-    }).then((res) =>
-      res.json()
+    }).then((res) => {
+      return res.json()
+    }
     ).then((data: CreateLobbyResponse) => {
-      redirect(data.url)
+      router.push(data.url)
     })
   }
 

@@ -4,8 +4,8 @@ interface CreateLobbyResponse {
 }
 
 interface IdMessageClient {
-    name: string
-    id: string
+    name: string | null
+    id: string | null
 }
 
 interface IdMessageServer {
