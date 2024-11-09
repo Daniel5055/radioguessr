@@ -38,37 +38,35 @@ export const Radio: React.FC<RadioProps> = ({ urls }) => {
     }, [volume]);
 
     return (
-        <div className="absolute bottom-0 left-0 right-0 p-4">
-            <div className="flex flex-col md:flex-row gap-x-2 gap-y-4 md:items-center bg-slate-800 p-2 rounded-lg shadow-lg border border-slate-500 w-full">
-                <div className="flex gap-x-2 items-center">
-                {isPlaying ? (
-                    <Button onClick={pause}>
-                        <FaPause />
-                    </Button> ) : (
-                    <Button onClick={play}>
-                        <FaPlay />
-                    </Button>
-                )}
-                <Button onClick={() => setUrlIndex((urlIndex - 1 + urls.length) % urls.length)}>
-                    <FaChevronLeft />
+        <div className="flex flex-col md:flex-row gap-x-2 gap-y-4 md:items-center bg-slate-800 p-2 rounded-lg shadow-lg border border-slate-500 w-full">
+            <div className="flex gap-x-2 items-center">
+            {isPlaying ? (
+                <Button onClick={pause}>
+                    <FaPause />
+                </Button> ) : (
+                <Button onClick={play}>
+                    <FaPlay />
                 </Button>
-                <Button onClick={() => setUrlIndex((urlIndex + 1) % urls.length)}>
-                    <FaChevronRight />
-                </Button>
-                </div>
-                <Slider
-                    value={[volume]}
-                    onValueChange={(values) => setVolume(values[0])}
-                    min={0}
-                    max={1}
-                    step={0.01}
-                    className="flex-grow"
-                />
-                <audio ref={audioRef} controls autoPlay className="hidden">
-                    <source src={urls[urlIndex]} />
-                    Your browser does not support the audio element.
-                </audio>
+            )}
+            <Button onClick={() => setUrlIndex((urlIndex - 1 + urls.length) % urls.length)}>
+                <FaChevronLeft />
+            </Button>
+            <Button onClick={() => setUrlIndex((urlIndex + 1) % urls.length)}>
+                <FaChevronRight />
+            </Button>
             </div>
+            <Slider
+                value={[volume]}
+                onValueChange={(values) => setVolume(values[0])}
+                min={0}
+                max={1}
+                step={0.01}
+                className="flex-grow"
+            />
+            <audio ref={audioRef} controls autoPlay className="hidden">
+                <source src={urls[urlIndex]} />
+                Your browser does not support the audio element.
+            </audio>
         </div>
     );
 };

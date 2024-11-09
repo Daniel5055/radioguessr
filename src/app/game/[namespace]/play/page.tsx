@@ -6,6 +6,7 @@ import { Country } from "@/types/country";
 import { Radio } from "./Radio";
 import CountryFlag from "./CountryFlag";
 import PollLeaderboard from "./PollLeaderboard";
+import { Countdown } from "./Countdown";
 
 function GamePage() {
     const router = useParams();
@@ -24,7 +25,14 @@ function GamePage() {
             <CountryFlag alpha2={selectedCountry?.alpha2} />
             <PollLeaderboard leaderboard={leaderboard} alpha2={selectedCountry?.alpha2} />
             <Globe onSelectCountry={setSelectedCountry} />
-            <Radio urls={["https://radio.garden/api/ara/content/listen/FhL85inn/channel.mp3"]} />
+            <div className="absolute bottom-0 left-0 right-0 p-4">
+                <div className="flex gap-x-2 relative">
+                    <div className="flex-1">
+                        <Radio urls={["https://radio.garden/api/ara/content/listen/FhL85inn/channel.mp3"]} />
+                    </div>
+                    <Countdown duration={100} />
+                </div>
+            </div>
         </div>
     )
 }
