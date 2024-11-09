@@ -64,8 +64,7 @@ export const Radio: React.FC<RadioProps> = ({ urls, start }) => {
                 step={0.01}
                 className="flex-grow"
             />
-            <audio ref={audioRef} controls autoPlay className="hidden">
-                <source src={urls[urlIndex]} />
+            <audio ref={audioRef} controls autoPlay className="hidden" src={urls[urlIndex]}>
                 Your browser does not support the audio element.
             </audio>
         </div>

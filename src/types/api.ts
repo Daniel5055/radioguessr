@@ -56,5 +56,5 @@ export interface ResultMessageServer {
     country: string
     // Votes per country per team
     votes: Record<string, Record<string, number>>
-    winner: string | null
+    winner: number | null
 }
