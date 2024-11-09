@@ -82,7 +82,7 @@ export default function Game() {
           <div className="p-6">
             <div className="grid md:grid-cols-2 gap-8">
               <div className="bg-gray-700 p-4 rounded-lg">
-                <h3 className="text-xl font-semibold mb-4 text-primary">Team Red</h3>
+                <h3 className="text-xl font-semibold mb-4 text-red-700">Team Red</h3>
                 <ul className="space-y-2">
                   {players.filter((p) => p.team === 0).map((p, i) => (
                     <li key={i} className="flex items-center space-x-2">
@@ -93,7 +93,7 @@ export default function Game() {
                 </ul>
               </div>
               <div className="bg-gray-700 p-4 rounded-lg">
-                <h3 className="text-xl font-semibold mb-4 text-primary">Team Blue</h3>
+                <h3 className="text-xl font-semibold mb-4 text-blue-700">Team Blue</h3>
                 <ul className="space-y-2">
                   {players.filter((p) => p.team === 1).map((p, i) => (
                     <li key={i} className="flex items-center space-x-2">

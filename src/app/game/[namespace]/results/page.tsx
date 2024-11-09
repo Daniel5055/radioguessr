@@ -72,7 +72,7 @@ export default function ResultsPage() {
         initial={{ opacity: 0, y: 100 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 10 }}
-        className="py-8 border-t"
+        className="pt-8 border-t"
       >
         <div className="flex flex-col justify-start items-start relative">
           <h2 className="font-semibold text-gray-100">Red Team Votes</h2>
