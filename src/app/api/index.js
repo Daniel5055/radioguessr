@@ -158,6 +158,11 @@ io.on('connection', (socket) => {
                 const team_sizes = calcTeamSizes(lobby.players);
                 const team = team_sizes[0] > team_sizes[1] ? 1 : 0;
                 const newPlayer = new Player(socket.id, genName(), team);
+
+                if (lobby.players.length == 0) {
+                    lobby.masterId = socket.id;
+                }
+
                 lobby.players.push(newPlayer);
 
                 socket.join(lobbyId); // add player to the room
