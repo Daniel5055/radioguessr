@@ -14,8 +14,8 @@ function PollLeaderboard({ leaderboard, color, alpha2 }: PollLeaderboardProps) {
     const maxVotes = Math.max(...Object.values(leaderboard));
 
     return (
-        <div className="absolute top-0 right-0 flex flex-col items-end">
-            {!isCollapsed && (
+        <div className="flex flex-col items-end">
+            {(!isCollapsed && Object.entries(leaderboard).length > 0) && (
                 <div className='p-2 bg-gray-800 border border-gray-700 rounded-lg shadow-lg'>
                     <div className="flex flex-col max-w-48 space-y-1">
                         {Object.entries(leaderboard).sort((a, b) => {
