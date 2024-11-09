@@ -1,5 +1,5 @@
 "use client"
 
-const API_PATH = process.env.API_PATH ?? 'https://db255.teaching.cs.st-andrews.ac.uk'
+const API_PATH = process.env.API_PATH ?? 'https://db255.teaching.cs.st-andrews.ac.uk/api'
 
 export { API_PATH }
