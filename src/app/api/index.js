@@ -1,4 +1,3 @@
-/* eslint-disable */
 const express = require('express');
 const { createServer } = require('http');
 const { Server } = require('socket.io');
@@ -262,36 +261,61 @@ io.on('connection', (socket) => {
         
 
     socket.on('disconnect', () => {
-        // for (const [lobbyId, details] of Object.entries(lobbies)) {
-        //     if (socket.id == details.masterId) {
-        //         let validMaster = false;
-        //         while (!validMaster) {
-        //             let pl = getRandom(details.players, 1);
-        //             if (pl) {
-        //                 if (pl.interval != -1) {
-        //                     validMaster = true;
-        //                     lobbies[lobbyId].masterId = pl.id;
-        //                 }
-        //             } else {
-        //                 console.log("No valid master found")
-        //                 lobbies[lobbyId].masterId = -1;
-        //                 validMaster = true;
-        //             }
-        //         }
+        for (const [lobbyId, details] of Object.entries(lobbies)) {
+            let playerIndex = details.players.findIndex(pl => pl.id == socket.id);
+            if (playerIndex > -1) {
+                console.log(playerIndex)
 
-        //         let player = details.players.find(pl => pl.id = socket.id);
-        //         socket.to(lobbyId).emit("PLAYER_OUT", {
-        //             name: player.username,
-        //             team : player.team
-        //         })
-        //         setTimeout((() => {
-        //             let index = details.players.indexOf(player)
-        //             lobbies[lobbyId].players.splice(index, 1)
-        //             console.log(`a user (${socket.id}) disconnected`)
-        //             clearInterval(this)
-        //         }), 5000) // remove player in some time
-        //     }
-        // }
+                let interval = setTimeout((() => {
+                    socket.to(lobbyId).emit("PLAYER_OUT", {
+                        name: details.players[playerIndex].username,
+                        team: details.players[playerIndex].team
+                    })
+                    lobbies[lobbyId].players.splice(playerIndex, 1)
+                    console.log(`a user (${socket.id}) disconnected`)
+                }), 5000) // remove player in some time
+                lobbies[lobbyId].players[playerIndex].interval = interval;
+            }
+
+            // find valid master
+            if (socket.id == details.masterId) {
+                let validMaster = false;
+                let idx = 1;
+                while (!validMaster) {
+                    if (details.players.length > 1) {
+                        console.log(details.players)
+                        console.log(idx)
+                        let pl = details.players[idx];
+                        if (pl) {
+                            if (pl.interval == -1) {
+                                validMaster = true;
+                                console.log("Valid master found: " + pl.username)
+                                lobbies[lobbyId].masterId = pl.id;
+                                io.to(pl.masterId).emit("ID", {
+                                    id: pl.id,
+                                    name: pl.username,
+                                    team: pl.team,
+                                    isMaster: true,
+                                    players: lobbies[lobbyId].players.map((p) => ({
+                                        name: p.username,
+                                        team: p.team,
+                                    }))
+                                })
+                            }
+                        } else {
+                            console.log("No valid master found: no possibilities")
+                            lobbies[lobbyId].masterId = -1;
+                            validMaster = true;
+                        }
+                    } else {
+                        console.log("No valid master found: lobby empty")
+                            lobbies[lobbyId].masterId = -1;
+                            validMaster = true;
+                    }
+                    idx += 1;
+                }
+            }
+        }
     })
 })
 
