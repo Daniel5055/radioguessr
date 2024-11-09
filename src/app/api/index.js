@@ -179,6 +179,11 @@ io.on('connection', (socket) => {
                 });
 
                 console.log(`Player joined the lobby ${lobbyId} as ${newPlayer.username}`);
+
+                socket.broadcast.to(lobbyId).emit("PLAYER_IN", {
+                    name: newPlayer.username,
+                    team : newPlayer.team
+                })
             }
         } else {
             socket.disconnect(true);
