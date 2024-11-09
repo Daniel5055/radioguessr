@@ -6,26 +6,33 @@ interface CreateLobbyResponse {
 interface IdMessageClient {
     name: string | null
     id: string | null
+    lobby: string
 }
 
 interface IdMessageServer {
     name: string
     id: string
-    team: string
+    team: number
+    isMaster: boolean
+    players: {
+        name: string
+        team: number
+    }[]
+}
+
+interface PlayerInMessageServer {
+    name: string
+    team: number
+}
+
+interface PlayerOutMessageServer {
+    name: string
+    team: number
 }
 
 interface StartMessageServer {
-    radio: string
-    id: number
-}
-
-interface TuneMessageClient {
-    diff: number
-}
-
-interface StationMessageServer {
-    radio: string
-    id: number
+    radio: string[]
+    start: number
 }
 
 interface VoteMessageClient {

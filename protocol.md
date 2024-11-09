@@ -30,6 +30,7 @@ On joining a lobby, user connects to server socket and emits.
 {
     name: string,
     id: string
+    lobby: string
 }
 ```
 
@@ -46,6 +47,7 @@ If joined successful, server sends back to the user
 {
     id: string
     name: string
+    isMaster: boolean
     team: number
     players: {
         name: string
@@ -59,6 +61,28 @@ where id should be the same id as given by the user, or a new id if the user gav
 If the id is unrecognised, the server responds with a new id
 
 If the id is recognised, then send back the same id with same name and team
+
+---
+
+When another player joins, all other players are notified by
+
+```ts
+"PLAYER_IN"
+{
+    name: string
+    team: string
+}
+```
+
+And when a player leaves, all other players are notified by
+
+```ts
+"PLAYER_OUT"
+{
+    name: string
+    team: string
+}
+```
 
 ## Game Starting
 
