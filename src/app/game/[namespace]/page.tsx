@@ -1,5 +1,6 @@
 "use client"
 
+import { Button } from "@/components/ui/button"
 import { MePlayer, Player } from "@/types/game";
 import socket from "@/utils/socket";
 import { useParams } from "next/navigation";
@@ -64,33 +65,52 @@ export default function Game() {
   console.log(players)
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-background text-foreground gap-10">
-      <h1 className="text-4xl font-bold">Lobby for game {params.namespace}</h1>
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <h2 className="text-2xl font-bold">Team Red</h2>
-          <ul>
-            {players.filter((p) => p.team === 0).map((p, i) => (
-              <li key={i} className={p.name === player.name ? 'font-bold' : ''}>{p.name}</li>
-            ))}
-          </ul>
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white">
+      <main className="container mx-auto pt-16 px-4">
+        <div className="max-w-4xl mx-auto bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+          <div className="bg-primary p-4">
+            <h2 className="text-3xl font-bold text-center">Game: {params.namespace}</h2>
+          </div>
+          <div className="p-6">
+            <div className="grid md:grid-cols-2 gap-8">
+              <div className="bg-gray-700 p-4 rounded-lg">
+                <h3 className="text-xl font-semibold mb-4 text-primary">Team Red</h3>
+                <ul className="space-y-2">
+                  {players.filter((p) => p.team === 0).map((p, i) => (
+                    <li key={i} className="flex items-center space-x-2">
+                      <span className="w-2 h-2 bg-primary rounded-full"></span>
+                      <span className={p.name === player.name ? 'font-bold' : ''}>{p.name}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="bg-gray-700 p-4 rounded-lg">
+                <h3 className="text-xl font-semibold mb-4 text-primary">Team Blue</h3>
+                <ul className="space-y-2">
+                  {players.filter((p) => p.team === 1).map((p, i) => (
+                    <li key={i} className="flex items-center space-x-2">
+                      <span className="w-2 h-2 bg-primary rounded-full"></span>
+                      <span className={p.name === player.name ? 'font-bold' : ''}>{p.name}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+            { player.isMaster ? 
+              <div className="mt-8 flex justify-center">
+                <Button className="bg-primary hover:bg-hover text-white font-bold py-3 px-6 rounded-full text-lg transition-colors duration-300">
+                  Start Game
+                </Button>
+              </div>
+              : null
+            }
+          </div>
         </div>
-        <div>
-          <h2 className="text-2xl font-bold">Team Blue</h2>
-          <ul>
-            {players.filter((p) => p.team === 1).map((p, i) => (
-              <li key={i} className={p.name === player.name ? 'font-bold' : ''}>{p.name}</li>
-            ))}
-          </ul>
-        </div>
-      </div>
-      {
-        player.isMaster ?
-        <button>
-          start
-        </button>
-        : null
-      }
+      </main>
+
+      <footer className="container mx-auto mt-16 py-6 px-4 text-center text-gray-400">
+        <p>&copy; 2023 RadioGuessr. All rights reserved.</p>
+      </footer>
     </div>
-  );
+  )
 }

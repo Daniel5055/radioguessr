@@ -33,7 +33,7 @@ export default function GameLayout({children}: { children: ReactNode}) {
     switch (connectionStatus) {
         case 'loading':
             return (
-                children
+                <p>Loading...</p>
             );
         case 'connected':
             return (
