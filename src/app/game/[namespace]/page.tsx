@@ -1,6 +1,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
+import { IdMessageClient, IdMessageServer, PlayerInMessageServer, PlayerOutMessageServer } from "@/types/api";
 import { MePlayer, Player } from "@/types/game";
 import socket from "@/utils/socket";
 import { useParams } from "next/navigation";
