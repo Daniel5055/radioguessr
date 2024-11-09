@@ -9,6 +9,7 @@ import PollLeaderboard from "./PollLeaderboard";
 import { Countdown } from "./Countdown";
 import RadioContext from "@/utils/RadioContext";
 import socket from "@/utils/socket";
+import { PollsMessageServer, VoteMessageClient } from "@/types/api";
 
 function GamePage() {
     const router = useParams();
@@ -22,6 +23,13 @@ function GamePage() {
         'BR': 2,
     });
 
+    useEffect(() => {
+      if (!radioInfo) return;
+      socket.on('POLLS', (res: PollsMessageServer) => {
+        setLeaderboard(res.votes)
+      })
+    }, [radioInfo])
+
     if (radioInfo == null) {
       return <p>Waiting for radio info</p>
     }
@@ -29,19 +37,12 @@ function GamePage() {
     function onVote(country: string) {
       const req: VoteMessageClient = { country, lobby: router.namespace as string };
       socket.emit('VOTE', req)
-      console.log('emit VOTE')
     }
 
     function selectCountry(country: Country) {
       onVote(country.alpha2)
       setSelectedCountry(country)
     }
-
-    useEffect(() => {
-      socket.on('POLLS', (res: PollsMessageServer) => {
-        setLeaderboard(res.votes)
-      })
-    }, [])
 
     return (
         <div className="flex flex-col overflow-y-hidden h-[100vh] relative">
@@ -54,7 +55,7 @@ function GamePage() {
                 </div>
             </div>
             <Globe onSelectCountry={selectCountry} />
-            <div className="absolute bottom-20 left-0 right-0 p-4">
+            <div className="absolute bottom-0 left-0 right-0 p-4">
                 <div className="flex gap-x-2 relative">
                     <div className="flex-1 h-fit my-auto">
                         <Radio urls={radioInfo.radios} start={radioInfo.start} />

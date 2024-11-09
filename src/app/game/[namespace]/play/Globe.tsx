@@ -95,7 +95,7 @@ const Globe = ({ onSelectCountry }: {
     
             // Convert 3D coordinates to latitude and longitude
             const lon = ((180 + (Math.atan2(point.x, point.z) * 180) / Math.PI) % 360) - 180;
-            const lat = 90 - (Math.acos(point.y / point.length()) * 180) / Math.PI;
+            const lat = 90 - (Math.acos(point.y / point.length()) * 180) / Math.PI + 8;
   
             // Get country name
             const country = crg.get_country(lat, lon);

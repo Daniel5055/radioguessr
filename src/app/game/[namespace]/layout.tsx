@@ -1,4 +1,5 @@
 "use client"
+import { ResultMessageServer, StartMessageServer } from "@/types/api";
 import RadioContext from "@/utils/RadioContext";
 import ResultContext from "@/utils/ResultContext";
 import socket from "@/utils/socket";

@@ -1,19 +1,19 @@
 
-interface CreateLobbyResponse {
+export interface CreateLobbyResponse {
     url: string
 }
 
-interface IdMessageClient {
+export interface IdMessageClient {
     name: string | null
     id: string | null
     lobby: string
 }
 
-interface StartMessageClient {
+export interface StartMessageClient {
     lobby: string
 }
 
-interface IdMessageServer {
+export interface IdMessageServer {
     name: string
     id: string
     team: number
@@ -24,35 +24,35 @@ interface IdMessageServer {
     }[]
 }
 
-interface PlayerInMessageServer {
+export interface PlayerInMessageServer {
     name: string
     team: number
 }
 
-interface PlayerOutMessageServer {
+export interface PlayerOutMessageServer {
     name: string
     team: number
 }
 
-interface StartMessageServer {
+export interface StartMessageServer {
     radios: string[]
     start: number
 }
 
-interface VoteMessageClient {
+export interface VoteMessageClient {
     country: string
     lobby: string
 }
 
-interface PollsMessageServer {
+export interface PollsMessageServer {
     votes: Record<string, number>
 }
 
-interface CountdownMessageServer {
+export interface CountdownMessageServer {
     time: number
 }
 
-interface ResultMessageServer {
+export interface ResultMessageServer {
     country: string
     // Votes per country per team
     votes: Record<string, Record<string, number>>
