@@ -101,6 +101,37 @@ function getRandom(arr, n) {
 }
 
 
+function getVotesByTeam(players) {
+    const votes = {
+        0: {},
+        1: {}
+    };
+
+    players.forEach(player => {
+        if (player.team === 0) {
+            players.guesses.forEach(guess => {
+                if (votes[0].hasOwnProperty(guess)) {
+                    votes[0][guess] += 1
+                } else {
+                    votes[0][guess] = 1
+                }
+            })
+        } else if (player.team === 1) {
+            
+            players.guesses.forEach(guess => {
+                if (votes[1].hasOwnProperty(guess)) {
+                    votes[1][guess] += 1
+                } else {
+                    votes[1][guess] = 1
+                }
+            })
+        }
+    });
+
+    return teamSize;
+}
+
+
 io.on('connection', (socket) => {
     console.log(`a user (${socket.id}) joined`);
 
