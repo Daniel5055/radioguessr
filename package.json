@@ -6,16 +6,21 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "dev:server": "node src/app/api/index.js"
   },
   "dependencies": {
     "@turf/turf": "^7.1.0",
     "country-reverse-geocoding": "^0.2.2",
+    "three": "^0.170.0",
+    "three-globe": "^2.34.4",
+    "cors": "^2.8.5",
+    "express": "^4.21.1",
     "next": "15.0.3",
     "react": "19.0.0-rc-66855b96-20241106",
     "react-dom": "19.0.0-rc-66855b96-20241106",
-    "three": "^0.170.0",
-    "three-globe": "^2.34.4"
+    "socket.io": "^4.8.1",
+    "socket.io-client": "^4.8.1"
   },
   "devDependencies": {
     "@types/node": "^20",
