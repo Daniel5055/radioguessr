@@ -1,9 +1,17 @@
 "use client"
+import RadioContext from "@/utils/RadioContext";
 import socket from "@/utils/socket";
+import { usePathname, useRouter } from "next/navigation";
 import { ReactNode, useEffect, useState } from "react";
 
 export default function GameLayout({children}: { children: ReactNode}) {
     const [connectionStatus, setConnectionStatus] = useState<'loading' | 'connected' | 'error'>('loading')
+    const [radios, setRadios] = useState<string[]>([])
+    const [start, setStart] = useState<number>(0)
+
+    const router = useRouter()
+    const path = usePathname()
+
     useEffect(() => {
         if (!socket.connected) {
             socket.connect()
@@ -23,8 +31,16 @@ export default function GameLayout({children}: { children: ReactNode}) {
             setConnectionStatus('error')
         })
 
+        socket.on('START', (res: StartMessageServer) => {
+            setRadios(res.radios)
+            setStart(res.start)
+
+            router.replace(path + '/game')
+        })
+
         return () => {
             socket.off('disconnect');
+            socket.off('START')
             socket.offAny();
             socket.disconnect();
         }
@@ -37,7 +53,9 @@ export default function GameLayout({children}: { children: ReactNode}) {
             );
         case 'connected':
             return (
-                children
+                <RadioContext.Provider value={{radios, start}}>
+                    children
+                </RadioContext.Provider>
             );
         case 'error':
             return <p>Error</p>

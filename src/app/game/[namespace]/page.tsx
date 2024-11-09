@@ -11,6 +11,10 @@ export default function Game() {
   const [players, setPlayers] = useState<Player[]>([])
   const [player, setPlayer] = useState<MePlayer>()
 
+  function onStart() {
+    socket.emit('START')
+  }
+
   useEffect(() => {
     if (!socket.connected) {
       return

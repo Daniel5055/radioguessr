@@ -31,7 +31,7 @@ interface PlayerOutMessageServer {
 }
 
 interface StartMessageServer {
-    radio: string[]
+    radios: string[]
     start: number
 }
 
