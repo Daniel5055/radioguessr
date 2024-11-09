@@ -67,10 +67,10 @@ The lobby master sends to the server
 }
 ```
 
-And the server sends the following message to all
+And the server sends the following message back
 
 ```ts
-"STATION"
+"START"
 {
     radio: string // url to starting station
     id: number // radio id (used for navigation)
@@ -88,7 +88,15 @@ Each user can send the following to change the radio station they are listening 
 }
 ```
 
-And the server will respond with a STATION message (see above) to that user
+And the server will respond with a a new statio
+
+```ts
+"STATION"
+{
+    radio: string // url to starting station
+    id: number // radio id (used for navigation)
+}
+```
 
 ---
 
@@ -101,3 +109,51 @@ Users may select a country, sending the following message
 }
 ```
 
+---
+
+Every n seconds or so, the server will send the following message to each user
+
+```ts
+"POLLS"
+{
+    votes: {
+        [country /* 2 characters */]: number // Number of votes per country
+    }
+}
+```
+
+---
+
+Each user will keep track of their own time (god help us). In the final 10 seconds, the server will emit the following every second
+
+```ts
+"COUNTDOWN"
+{
+    time: number // Seconds left
+}
+```
+
+When the countdown reaches zero, a result message is sent to all users
+
+```ts
+"RESULT"
+{
+    // Results
+    country: string // The answer
+    votes: {
+        [team]: {
+            [country]: number
+        }
+    }
+    winner: team | null // Team number, null if no one wins
+}
+```
+
+---
+
+The lobby master may chose to continue to the lobby with the event 
+
+```ts
+"LOBBY"
+{
+}
