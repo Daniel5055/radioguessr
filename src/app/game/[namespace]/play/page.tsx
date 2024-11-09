@@ -22,12 +22,14 @@ function GamePage() {
 
     return (
         <div className="flex flex-col overflow-y-hidden h-[100vh] relative">
-            <CountryFlag alpha2={selectedCountry?.alpha2} />
-            <PollLeaderboard leaderboard={leaderboard} alpha2={selectedCountry?.alpha2} />
+            <div>
+                <CountryFlag alpha2={selectedCountry?.alpha2} />
+                <PollLeaderboard leaderboard={leaderboard} alpha2={selectedCountry?.alpha2} />
+            </div>
             <Globe onSelectCountry={setSelectedCountry} />
             <div className="absolute bottom-0 left-0 right-0 p-4">
                 <div className="flex gap-x-2 relative">
-                    <div className="flex-1">
+                    <div className="flex-1 h-fit my-auto">
                         <Radio urls={["https://radio.garden/api/ara/content/listen/FhL85inn/channel.mp3"]} />
                     </div>
                     <Countdown duration={100} />

@@ -25,5 +25,5 @@ export const Countdown: React.FC<CountdownProps> = ({ duration, onEnd }) => {
         };
     }, [onEnd]);
 
-    return <div className="flex items-center justify-center bg-slate-800 p-2 rounded-lg shadow-lg border border-slate-500 text-white h-[76px] w-8">{time}</div>;
+    return <div className="flex items-center justify-center bg-slate-800 p-2 rounded-lg shadow-lg border border-slate-500 text-white w-8">{time}</div>;
 };
