@@ -346,5 +346,5 @@ function startGame(lobbyId, urls, country) {
             votes,
             winner: getWinner(lobbies[lobbyId].players, lobbies[lobbyId].correct),
         })
-    }, 100000)
+    }, 30000)
 }

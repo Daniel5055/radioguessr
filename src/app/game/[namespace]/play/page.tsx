@@ -60,7 +60,7 @@ function GamePage() {
                     <div className="flex-1 h-fit my-auto">
                         <Radio urls={radioInfo.radios} start={radioInfo.start} />
                     </div>
-                    <Countdown duration={100} />
+                    <Countdown duration={30} />
                 </div>
             </div>
         </div>
