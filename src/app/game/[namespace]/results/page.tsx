@@ -1,7 +1,7 @@
 "use client"
 
 import { motion } from 'framer-motion';
-import { useCallback, useContext, useEffect, useState } from "react";
+import { useCallback, useContext } from "react";
 import countries from "@/assets/countries.json";
 
 import CountryFlag from "@/components/ui/CountryFlag";
