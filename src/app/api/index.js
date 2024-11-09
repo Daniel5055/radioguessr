@@ -42,9 +42,10 @@ app.post('/create', (req, res) => {
     const lobbyId = crypto.randomBytes(4).toString('hex');
     
     lobbies[lobbyId] = {
-        masterId: null,
+        masterId: -1,
         players: [],
         max_guesses: 1, // change later?
+        correct: null,
     };
 
     res.json({
@@ -58,6 +59,7 @@ class Player {
         this.username = name;
         this.team = team;
         this.guesses = [];
+        this.interval = -1;
     }
 }
 
@@ -131,6 +133,25 @@ function getVotesByTeam(players) {
     return votes;
 }
 
+function getWinner(players, correct) {
+    let votes = getVotesByTeam(players);
+    let zeroVal;
+    let oneVal;
+    if (correct in votes[0]) {
+        zeroVal = votes[0][correct]
+    }
+
+    if (correct in votes[1]) {
+        oneVal = votes[1][correct]
+    }
+
+    if (zeroVal != -1 && oneVal != -1) {
+        return zeroVal > oneVal ? 0 : zeroVal == oneVal ? -1 : 1
+    } 
+    if (zeroVal != -1) return 0;
+    if (oneVal != -1) return 1;
+    return null;
+}
 
 io.on('connection', (socket) => {
     console.log(`a user (${socket.id}) joined`);
@@ -143,6 +164,9 @@ io.on('connection', (socket) => {
             if (player) {
                 socket.join(lobbyId);
                 player.id = socket.id;
+
+                clearTimeout(player.interval); // stop them from being deleted
+                player.interval = -1;
                 socket.emit("ID", {
                     id: player.id,
                     name: player.username,
@@ -159,7 +183,7 @@ io.on('connection', (socket) => {
                 const team = team_sizes[0] > team_sizes[1] ? 1 : 0;
                 const newPlayer = new Player(socket.id, genName(), team);
 
-                if (lobby.players.length == 0) {
+                if (lobby.players.length == 0 || lobby.masterId == -1) {
                     lobby.masterId = socket.id;
                 }
 
@@ -179,6 +203,11 @@ io.on('connection', (socket) => {
                 });
 
                 console.log(`Player joined the lobby ${lobbyId} as ${newPlayer.username}`);
+
+                socket.broadcast.to(lobbyId).emit("PLAYER_IN", {
+                    name: newPlayer.username,
+                    team : newPlayer.team
+                })
             }
         } else {
             socket.disconnect(true);
@@ -204,7 +233,7 @@ io.on('connection', (socket) => {
                     valid_country = urls.length >= 5;
                     if (valid_country) {
                         urls = getRandom(urls, 5);
-
+                        lobbies[lobbyId].correct = code;
                         startGame(lobbyId, urls, code)
                     }
 
@@ -232,8 +261,36 @@ io.on('connection', (socket) => {
         
 
     socket.on('disconnect', () => {
-        // if user is lobby master, assign different
-        console.log(`a user (${socket.id}) disconnected`);
+        // for (const [lobbyId, details] of Object.entries(lobbies)) {
+        //     if (socket.id == details.masterId) {
+        //         let validMaster = false;
+        //         while (!validMaster) {
+        //             let pl = getRandom(details.players, 1);
+        //             if (pl) {
+        //                 if (pl.interval != -1) {
+        //                     validMaster = true;
+        //                     lobbies[lobbyId].masterId = pl.id;
+        //                 }
+        //             } else {
+        //                 console.log("No valid master found")
+        //                 lobbies[lobbyId].masterId = -1;
+        //                 validMaster = true;
+        //             }
+        //         }
+
+        //         let player = details.players.find(pl => pl.id = socket.id);
+        //         socket.to(lobbyId).emit("PLAYER_OUT", {
+        //             name: player.username,
+        //             team : player.team
+        //         })
+        //         setTimeout((() => {
+        //             let index = details.players.indexOf(player)
+        //             lobbies[lobbyId].players.splice(index, 1)
+        //             console.log(`a user (${socket.id}) disconnected`)
+        //             clearInterval(this)
+        //         }), 5000) // remove player in some time
+        //     }
+        // }
     })
 })
 
@@ -261,7 +318,7 @@ function startGame(lobbyId, urls, country) {
         io.to(lobbyId).emit('RESULT', {
             country,
             votes,
-            winner: null,
+            winner: getWinner(lobbies[lobbyId].players, lobbies[lobbyId].correct),
         })
-    }, 10000)
+    }, 100000)
 }
