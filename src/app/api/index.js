@@ -44,6 +44,7 @@ app.post('/create', (req, res) => {
     lobbies[lobbyId] = {
         masterId: null,
         players: [],
+        max_guesses: 1, // change later?
     };
 
     res.json({
@@ -100,6 +101,37 @@ function getRandom(arr, n) {
 }
 
 
+function getVotesByTeam(players) {
+    const votes = {
+        0: {},
+        1: {}
+    };
+
+    players.forEach(player => {
+        if (player.team === 0) {
+            players.guesses.forEach(guess => {
+                if (votes[0].hasOwnProperty(guess)) {
+                    votes[0][guess] += 1
+                } else {
+                    votes[0][guess] = 1
+                }
+            })
+        } else if (player.team === 1) {
+            
+            players.guesses.forEach(guess => {
+                if (votes[1].hasOwnProperty(guess)) {
+                    votes[1][guess] += 1
+                } else {
+                    votes[1][guess] = 1
+                }
+            })
+        }
+    });
+
+    return teamSize;
+}
+
+
 io.on('connection', (socket) => {
     console.log(`a user (${socket.id}) joined`);
 
@@ -110,6 +142,7 @@ io.on('connection', (socket) => {
             const player = lobby.players.find((p) => p.username == name);
             if (player) {
                 socket.join(lobbyId);
+                player.id = socket.id;
                 socket.emit("ID", {
                     id: player.id,
                     name: player.username,
@@ -125,6 +158,11 @@ io.on('connection', (socket) => {
                 const team_sizes = calcTeamSizes(lobby.players);
                 const team = team_sizes[0] > team_sizes[1] ? 1 : 0;
                 const newPlayer = new Player(socket.id, genName(), team);
+
+                if (lobby.players.length == 0) {
+                    lobby.masterId = socket.id;
+                }
+
                 lobby.players.push(newPlayer);
 
                 socket.join(lobbyId); // add player to the room
@@ -147,7 +185,7 @@ io.on('connection', (socket) => {
         }
     });
 
-    socket.on("START", () => {
+    socket.on("START", ({lobby: lobbyId}) => {
         const keys = Object.keys(countries);
         let valid_country = false;
 
@@ -166,14 +204,29 @@ io.on('connection', (socket) => {
 
                     urls = getRandom(urls, 5);
 
-                    rs = socket.rooms
-                    rs.delete(socket.id)
-                    io.to(rs.keys().next()).emit("START", {
+                    io.to(lobbyId).emit("START", {
                         radio: urls,
                         start: 2
                     })
                 })
             })
+        }
+    })
+
+    socket.on("VOTE", ({country, lobby: lobbyId}) => {
+        const lobby = lobbies[lobbyId];
+        if (lobby) {
+            const player = lobby.players.find((p) => p.id == socket.id);
+            if (player) {
+                if (player.guesses.length = max_guesses) {
+                    player.guesses.shift();
+                }
+                player.guesses.push(country);
+            } else {
+                socket.disconnect(true);
+            }
+        } else {
+            socket.disconnect(true);
         }
     })
         
