@@ -1,7 +1,7 @@
 "use client"
 
 import { motion } from 'framer-motion';
-import { useCallback, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import countries from "@/assets/countries.json";
 
 import CountryFlag from "@/components/ui/CountryFlag";
@@ -10,28 +10,19 @@ import PollLeaderboard from '../play/PollLeaderboard';
 import React from "react";
 import Particles from "react-tsparticles";
 import { loadConfettiPreset } from "tsparticles-preset-confetti";
+import ResultContext from '@/utils/ResultContext';
 
 export default function ResultsPage() {
-  const [countryCode] = useState<string>("GB");
-  const [winner] = useState<number>(1);
-
-  const [leaderboard1] = useState<Record<string, number>>({
-    'US': 10,
-    'CA': 8,
-    'MX': 6,
-    'BR': 2,
-  });
-  const [leaderboard2] = useState<Record<string, number>>({
-    'US': 5,
-    'CA': 3,
-    'MX': 2,
-    'BR': 1,
-  });
+  const results = useContext(ResultContext)
 
   const particlesInit = useCallback(async (engine: any) => {
     // Load the confetti preset
     await loadConfettiPreset(engine);
   }, []);
+
+  if (results == null) {
+    return <p>Missing results</p>
+  }
 
   return (
     <div className="min-h-svh flex flex-col bg-gradient-to-b from-gray-900 to-gray-800 px-4 py-8 text-white">
@@ -58,8 +49,8 @@ export default function ResultsPage() {
       >
         <h2 className="font-semibold text-gray-100">The Country of Origin was...</h2>
         <div className="flex items-center gap-x-2">
-          <h3 className="text-white text-2xl font-semibold">{(countries as any)[countryCode]}</h3>
-          <CountryFlag alpha2={countryCode} />
+          <h3 className="text-white text-2xl font-semibold">{(countries as any)[results.country]}</h3>
+          <CountryFlag alpha2={results.country} />
         </div>
       </motion.div>
 
@@ -72,7 +63,7 @@ export default function ResultsPage() {
         <h2 className="font-semibold text-gray-100">and the Winning Team is...</h2>
         <div className="flex items-center gap-x-2">
           <h3  className="text-white text-2xl font-semibold">
-            {winner === 0 ? "The Red Team" : "The Blue Team"}
+            {results.winner === 0 ? "The Red Team" : results.winner === 1 ? "The Blue Team" : results.winner === -1 ? "Both Teams" : "Neither Team"}
           </h3>
         </div>
       </motion.div>
@@ -85,12 +76,12 @@ export default function ResultsPage() {
       >
         <div className="flex flex-col justify-start items-start relative">
           <h2 className="font-semibold text-gray-100">Red Team Votes</h2>
-          <PollLeaderboard leaderboard={leaderboard1} color={'red'} />
+          <PollLeaderboard leaderboard={results.votes[0]} color={'red'} />
         </div>
 
         <div className='flex flex-col justify-start items-start relative'>
           <h2 className="font-semibold text-gray-100 mt-8">Blue Team Votes</h2>
-          <PollLeaderboard leaderboard={leaderboard2} color={'blue'} />
+          <PollLeaderboard leaderboard={results.votes[1]} color={'blue'} />
         </div>
       </motion.div>
     </div>
