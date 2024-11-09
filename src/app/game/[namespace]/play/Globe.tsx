@@ -41,7 +41,7 @@ const Globe = ({ onSelectCountry }: {
       .globeImageUrl('//unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
       .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
       .polygonsData(geoJson.features)
-      .polygonCapColor(() => 'rgba(99, 102, 241, 0.7)')
+      .polygonCapColor(() => 'rgba(99, 102, 241, 0.5)')
       .polygonSideColor(() => 'rgba(99, 102, 241, 0.5)')
       .polygonStrokeColor(() => '#111')
       .polygonsTransitionDuration(300)
@@ -109,6 +109,9 @@ const Globe = ({ onSelectCountry }: {
 
               globe.polygonAltitude((d: Record<string, any>) => {
                 return d.properties.ISO_A2 === alpha2 ? 0.05 : 0.01;
+              });
+              globe.polygonCapColor((d: Record<string, any>) => {
+                return d.properties.ISO_A2 === alpha2 ? 'rgba(99, 102, 241, 0.7)' : 'rgba(99, 102, 241, 0.5)';
               });
             }
         }
