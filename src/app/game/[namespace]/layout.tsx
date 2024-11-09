@@ -60,11 +60,7 @@ export default function GameLayout({children}: { children: ReactNode}) {
     switch (connectionStatus) {
         case 'loading':
             return (
-                <RadioContext.Provider value={{radios, start}}>
-                    <ResultContext.Provider value={results}>
-                        {children}
-                    </ResultContext.Provider>
-                </RadioContext.Provider>
+                <p>Loading...</p>
             );
         case 'connected':
             return (

@@ -37,7 +37,6 @@ function GamePage() {
     function onVote(country: string) {
       const req: VoteMessageClient = { country, lobby: router.namespace as string };
       socket.emit('VOTE', req)
-      console.log('emit VOTE')
     }
 
     function selectCountry(country: Country) {
