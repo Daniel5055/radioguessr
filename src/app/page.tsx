@@ -10,7 +10,7 @@ export default function Home() {
   const router = useRouter()
 
   function onCreate() {
-    fetch(`${API_PATH}/create`, {
+    fetch(`${API_PATH}/api/create`, {
       method: "POST"
     }).then((res) => {
       return res.json()
