@@ -1,4 +1,5 @@
 "use client"
+import { ResultMessageServer, StartMessageServer } from "@/types/api";
 import RadioContext from "@/utils/RadioContext";
 import ResultContext from "@/utils/ResultContext";
 import socket from "@/utils/socket";
@@ -59,7 +60,11 @@ export default function GameLayout({children}: { children: ReactNode}) {
     switch (connectionStatus) {
         case 'loading':
             return (
-                <p>Loading...</p>
+                <RadioContext.Provider value={{radios, start}}>
+                    <ResultContext.Provider value={results}>
+                        {children}
+                    </ResultContext.Provider>
+                </RadioContext.Provider>
             );
         case 'connected':
             return (
