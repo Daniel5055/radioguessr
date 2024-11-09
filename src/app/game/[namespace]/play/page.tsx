@@ -54,9 +54,9 @@ function GamePage() {
                 </div>
             </div>
             <Globe onSelectCountry={selectCountry} />
-            <div className="absolute bottom-0 left-0 right-0 p-4">
+            <div className="absolute bottom-20 left-0 right-0 p-4">
                 <div className="flex gap-x-2 relative">
-                    <div className="flex-1">
+                    <div className="flex-1 h-fit my-auto">
                         <Radio urls={radioInfo.radios} start={radioInfo.start} />
                     </div>
                     <Countdown duration={100} />
