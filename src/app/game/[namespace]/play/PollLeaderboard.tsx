@@ -6,9 +6,10 @@ import { cn } from '@/lib/utils';
 export interface PollLeaderboardProps {
     leaderboard: Record<string, number>;
     alpha2?: string;
+    color?: string;
 }
 
-function PollLeaderboard({ leaderboard, alpha2 }: PollLeaderboardProps) {
+function PollLeaderboard({ leaderboard, color, alpha2 }: PollLeaderboardProps) {
     const [isCollapsed, setIsCollapsed] = useState(false);
     const maxVotes = Math.max(...Object.values(leaderboard));
 
@@ -19,15 +20,17 @@ function PollLeaderboard({ leaderboard, alpha2 }: PollLeaderboardProps) {
                     <div className="flex flex-col max-w-48 space-y-1">
                         {Object.entries(leaderboard).sort((a, b) => {
                             return b[1] - a[1];
-                        }).map(([key, value]) => (
-                            <div key={key} className="flex items-center gap-x-2 text-white p-1 bg-gray-900 rounded-md">
-                                <span className={`flex-1 truncate ${alpha2 === key ? "text-indigo-500 font-bold" : ""}`}>{(countries as any)[key]}</span>
-                                <span className="w-20">
-                                    <Progress value={value / maxVotes * 100} />
-                                </span>
-                                <span className="flex justify-end w-5">{value}</span>
-                            </div>
-                        ))}
+                        }).map(([key, value]) => {
+                            return (
+                                <div key={key} className="flex items-center gap-x-2 text-white p-1 bg-gray-900 rounded-md">
+                                    <span className={`flex-1 truncate ${alpha2 === key ? "text-indigo-500 font-bold" : ""}`}>{(countries as any)[key]}</span>
+                                    <span className="w-1/3 min-w-24">
+                                        <Progress value={value / maxVotes * 100} color={color} />
+                                    </span>
+                                    <span className="flex justify-end w-5">{value}</span>
+                                </div>
+                            );
+                        })}
                     </div>
                 </div>
             )}

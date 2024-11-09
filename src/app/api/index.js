@@ -109,7 +109,7 @@ function getVotesByTeam(players) {
 
     players.forEach(player => {
         if (player.team === 0) {
-            players.guesses.forEach(guess => {
+            player.guesses.forEach(guess => {
                 if (votes[0].hasOwnProperty(guess)) {
                     votes[0][guess] += 1
                 } else {
@@ -118,7 +118,7 @@ function getVotesByTeam(players) {
             })
         } else if (player.team === 1) {
             
-            players.guesses.forEach(guess => {
+            player.guesses.forEach(guess => {
                 if (votes[1].hasOwnProperty(guess)) {
                     votes[1][guess] += 1
                 } else {
@@ -128,7 +128,7 @@ function getVotesByTeam(players) {
         }
     });
 
-    return teamSize;
+    return votes;
 }
 
 
@@ -185,7 +185,8 @@ io.on('connection', (socket) => {
         }
     });
 
-    socket.on("START", ({lobby: lobbyId}) => {
+    socket.on("START", async ({lobby: lobbyId}) => {
+        console.log('start')
         const keys = Object.keys(countries);
         let valid_country = false;
 
@@ -193,21 +194,20 @@ io.on('connection', (socket) => {
             const code = keys[keys.length * Math.random() << 0];
             const country = countries[code];
     
-            fetch("http://radio.garden/api/search?q=" + country).then((res) => res.json()).then((body) => {
+            await fetch("http://radio.garden/api/search?q=" + country).then((res) => res.json()).then(async (body) => {
                 const visitUrl = body.hits.hits[0]._source.url;
                 const countryAPIUrl = "http://radio.garden/api/ara/content/page/" + visitUrl.split('/').at(-1);
-                fetch(countryAPIUrl).then((res) => res.json()).then((body) => {
+                await fetch(countryAPIUrl).then((res) => res.json()).then((body) => {
                     const stations = body.data.content[0].items
                     let urls = stations.map(s => s.page.url.split('/'))
                     urls = urls.map(u => "http://radio.garden/api/ara/content/" + u[1] + "/" + u.at(-1) + "/channel.mp3")
                     valid_country = urls.length >= 5;
+                    if (valid_country) {
+                        urls = getRandom(urls, 5);
 
-                    urls = getRandom(urls, 5);
+                        startGame(lobbyId, urls, code)
+                    }
 
-                    io.to(lobbyId).emit("START", {
-                        radio: urls,
-                        start: 2
-                    })
                 })
             })
         }
@@ -218,7 +218,7 @@ io.on('connection', (socket) => {
         if (lobby) {
             const player = lobby.players.find((p) => p.id == socket.id);
             if (player) {
-                if (player.guesses.length = max_guesses) {
+                if (player.guesses.length = lobbies[lobbyId].max_guesses) {
                     player.guesses.shift();
                 }
                 player.guesses.push(country);
@@ -237,10 +237,31 @@ io.on('connection', (socket) => {
     })
 })
 
-const INTERVAL = 16;
+function startGame(lobbyId, urls, country) {
+    io.to(lobbyId).emit("START", {
+        radios: urls,
+        start: 2
+    })
 
-function gameloop() {
+    const polling = setInterval(() => {
+        const votes = getVotesByTeam(lobbies[lobbyId].players)
+        for (const player of lobbies[lobbyId].players) {
+            io.to(player.id).emit('POLLS', {
+                votes: votes[player.team] ?? {}
+            })
+        }
+    }, 2000)
 
+
+    setTimeout(() => {
+        clearInterval(polling);
+
+        const votes = getVotesByTeam(lobbies[lobbyId].players)
+
+        io.to(lobbyId).emit('RESULT', {
+            country,
+            votes,
+            winner: null,
+        })
+    }, 10000)
 }
-
-setInterval(gameloop, INTERVAL);

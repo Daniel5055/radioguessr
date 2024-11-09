@@ -9,6 +9,10 @@ interface IdMessageClient {
     lobby: string
 }
 
+interface StartMessageClient {
+    lobby: string
+}
+
 interface IdMessageServer {
     name: string
     id: string
@@ -31,15 +35,16 @@ interface PlayerOutMessageServer {
 }
 
 interface StartMessageServer {
-    radio: string[]
+    radios: string[]
     start: number
 }
 
 interface VoteMessageClient {
     country: string
+    lobby: string
 }
 
-interface PollsMessageClient {
+interface PollsMessageServer {
     votes: Record<string, number>
 }
 

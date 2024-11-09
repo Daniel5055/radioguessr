@@ -11,6 +11,13 @@ export default function Game() {
   const [players, setPlayers] = useState<Player[]>([])
   const [player, setPlayer] = useState<MePlayer>()
 
+  function onStart() {
+    socket.emit('START', {
+        lobby: params.namespace as string,
+    })
+    console.log('emit START')
+  }
+
   useEffect(() => {
     if (!socket.connected) {
       return
@@ -98,7 +105,7 @@ export default function Game() {
             </div>
             { player.isMaster ? 
               <div className="mt-8 flex justify-center">
-                <Button className="bg-primary hover:bg-hover text-white font-bold py-3 px-6 rounded-full text-lg transition-colors duration-300">
+                <Button onClick={onStart} className="bg-primary hover:bg-hover text-white font-bold py-3 px-6 rounded-full text-lg transition-colors duration-300">
                   Start Game
                 </Button>
               </div>

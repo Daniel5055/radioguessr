@@ -13,7 +13,6 @@ function Country({ alpha2 }: CountryProps) {
     }
 
     return (
-        <div className="absolute p-4 top-0 left-0">
             <div>
             <TooltipProvider delayDuration={0}>
                 <Tooltip>
@@ -27,7 +26,6 @@ function Country({ alpha2 }: CountryProps) {
             </TooltipProvider>
             
             </div>
-        </div>
     );
 }
 

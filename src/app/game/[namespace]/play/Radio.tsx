@@ -8,10 +8,11 @@ import { FaChevronLeft, FaChevronRight, FaPause, FaPlay } from "react-icons/fa";
 
 export interface RadioProps {
     urls: string[];
+    start: number
 }
 
-export const Radio: React.FC<RadioProps> = ({ urls }) => {
-    const [urlIndex, setUrlIndex] = useState(0);
+export const Radio: React.FC<RadioProps> = ({ urls, start }) => {
+    const [urlIndex, setUrlIndex] = useState(start);
     const [volume, setVolume] = useState(1);
     
     const audioRef = useRef<HTMLAudioElement>(null);
