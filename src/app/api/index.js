@@ -67,22 +67,38 @@ function genName() {
     return name
 }
 
-function getPlayersByTeam(players) {
-    const groupedPlayers = {
-        0: [],
-        1: []
+function calcTeamSizes(players) {
+    const teamSize = {
+        0: 0,
+        1: 0
     };
 
     players.forEach(player => {
         if (player.team === 0) {
-            groupedPlayers[0].push(player);
+            teamSize[0] += 1;
         } else if (player.team === 1) {
-            groupedPlayers[1].push(player);
+            teamSize[1] += 1;
         }
     });
 
-    return groupedPlayers;
+    return teamSize;
 }
+
+
+function getRandom(arr, n) {
+    var result = new Array(n),
+        len = arr.length,
+        taken = new Array(len);
+    if (n > len)
+        throw new RangeError("getRandom: more elements taken than available");
+    while (n--) {
+        var x = Math.floor(Math.random() * len);
+        result[n] = arr[x in taken ? taken[x] : x];
+        taken[x] = --len in taken ? taken[len] : len;
+    }
+    return result;
+}
+
 
 io.on('connection', (socket) => {
     console.log(`a user (${socket.id}) joined`);
@@ -106,7 +122,8 @@ io.on('connection', (socket) => {
                 });
                 console.log(`Player rejoined the lobby ${lobbyId} as ${player.username}`);
             } else {
-                const team = Math.round(Math.random());
+                const team_sizes = calcTeamSizes(lobby.players);
+                const team = team_sizes[0] > team_sizes[1] ? 1 : 0;
                 const newPlayer = new Player(socket.id, genName(), team);
                 lobby.players.push(newPlayer);
 
@@ -126,21 +143,40 @@ io.on('connection', (socket) => {
                 console.log(`Player joined the lobby ${lobbyId} as ${newPlayer.username}`);
             }
         } else {
-            socket.disconnect(true, );
+            socket.disconnect(true);
         }
     });
 
     socket.on("START", () => {
-    const keys = Object.keys(countries);
-    const code = keys[keys.length * Math.random() << 0];
-    const country = countries[code];
+        const keys = Object.keys(countries);
+        let valid_country = false;
 
-    fetch("http://radio.garden/api/search?q=" + country).then((res) => res.json()).then((body) => {
-        const visitUrl = body.hits.hits[0]._source.url;
-        const countryAPIUrl = "http://radio.garden/api/ara/content/page/" + visitUrl.split('/').at(-1);
-        console.log(countryAPIUrl)
+        while (!valid_country) {
+            const code = keys[keys.length * Math.random() << 0];
+            const country = countries[code];
+    
+            fetch("http://radio.garden/api/search?q=" + country).then((res) => res.json()).then((body) => {
+                const visitUrl = body.hits.hits[0]._source.url;
+                const countryAPIUrl = "http://radio.garden/api/ara/content/page/" + visitUrl.split('/').at(-1);
+                fetch(countryAPIUrl).then((res) => res.json()).then((body) => {
+                    const stations = body.data.content[0].items
+                    let urls = stations.map(s => s.page.url.split('/'))
+                    urls = urls.map(u => "http://radio.garden/api/ara/content/" + u[1] + "/" + u.at(-1) + "/channel.mp3")
+                    valid_country = urls.length >= 5;
+
+                    urls = getRandom(urls, 5);
+
+                    rs = socket.rooms
+                    rs.delete(socket.id)
+                    io.to(rs.keys().next()).emit("START", {
+                        radio: urls,
+                        start: 2
+                    })
+                })
+            })
+        }
     })
-    })
+        
 
     socket.on('disconnect', () => {
         // if user is lobby master, assign different

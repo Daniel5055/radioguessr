@@ -41,8 +41,8 @@ const Globe = ({ onSelectCountry }: {
       .globeImageUrl('//unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
       .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
       .polygonsData(geoJson.features)
-      .polygonCapColor(() => 'rgba(99, 102, 241, 0.7)')
-      .polygonSideColor(() => 'rgba(165, 180, 252, 0.5)')
+      .polygonCapColor(() => 'rgba(99, 102, 241, 0.5)')
+      .polygonSideColor(() => 'rgba(99, 102, 241, 0.5)')
       .polygonStrokeColor(() => '#111')
       .polygonsTransitionDuration(300)
 
@@ -52,21 +52,18 @@ const Globe = ({ onSelectCountry }: {
     camera.position.z = 350;
 
     // Add lighting
-    const ambientLight = new THREE.AmbientLight(0xffffff, 2);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
     scene.add(ambientLight);
 
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
     directionalLight.position.set(1, 1, 1).normalize();
     scene.add(directionalLight);
-
-    // Make background white
-    renderer.setClearColor(0xffffff, 1);
 
     // Orbit controls to rotate the globe
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.1;
-    controls.minDistance = 50;
+    controls.minDistance = 150;
     controls.maxDistance = 350;
     
     // Only allow zooming and rotating, not panning
@@ -112,6 +109,9 @@ const Globe = ({ onSelectCountry }: {
 
               globe.polygonAltitude((d: Record<string, any>) => {
                 return d.properties.ISO_A2 === alpha2 ? 0.05 : 0.01;
+              });
+              globe.polygonCapColor((d: Record<string, any>) => {
+                return d.properties.ISO_A2 === alpha2 ? 'rgba(99, 102, 241, 0.7)' : 'rgba(99, 102, 241, 0.5)';
               });
             }
         }
