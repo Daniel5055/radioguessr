@@ -32,6 +32,9 @@ export default function DifficultyToggle() {
             bgcolor: '#6DB927',
             borderRadius: '0.5rem',
             margin: '0.3rem',
+            ":hover": {
+                bgcolor: '#6DB927',
+            }
         }
       }
     }
