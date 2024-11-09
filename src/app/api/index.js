@@ -33,8 +33,8 @@ const io = new Server(server, {
     }
 });
 
-server.listen(process.env.PORT ?? 8080, () => {
-    console.log(`listening on *:${process.env.PORT ?? 8080}`);
+server.listen(process.env.API_PORT ?? 8080, () => {
+    console.log(`listening on *:${process.env.API_PORT ?? 8080}`);
 });
 
 const lobbies = {}
