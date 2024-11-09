@@ -34,7 +34,7 @@ export default function ResultsPage() {
   }, []);
 
   return (
-    <div className="min-h-svh flex flex-col bg-slate-800 px-4 py-8 text-white">
+    <div className="min-h-svh flex flex-col bg-gradient-to-b from-gray-900 to-gray-800 px-4 py-8 text-white">
       <h1 className="text-white text-4xl font-semibold mb-4">Results</h1>
 
       <Particles
@@ -83,11 +83,15 @@ export default function ResultsPage() {
         transition={{ duration: 0.5, delay: 10 }}
         className="py-8 border-t"
       >
-        <h2 className="font-semibold text-gray-100">Red Team Votes</h2>
-        <PollLeaderboard leaderboard={leaderboard1} color={'red'} />
+        <div className="flex flex-col justify-start items-start relative">
+          <h2 className="font-semibold text-gray-100">Red Team Votes</h2>
+          <PollLeaderboard leaderboard={leaderboard1} color={'red'} />
+        </div>
 
-        <h2 className="font-semibold text-gray-100 mt-8">Blue Team Votes</h2>
-        <PollLeaderboard leaderboard={leaderboard2} color={'blue'} />
+        <div className='flex flex-col justify-start items-start relative'>
+          <h2 className="font-semibold text-gray-100 mt-8">Blue Team Votes</h2>
+          <PollLeaderboard leaderboard={leaderboard2} color={'blue'} />
+        </div>
       </motion.div>
     </div>
   );
