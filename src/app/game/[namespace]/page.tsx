@@ -12,7 +12,9 @@ export default function Game() {
   const [player, setPlayer] = useState<MePlayer>()
 
   function onStart() {
-    socket.emit('START')
+    socket.emit('START', {
+        lobby: params.namespace as string,
+    })
   }
 
   useEffect(() => {
