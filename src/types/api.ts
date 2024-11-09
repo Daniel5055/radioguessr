@@ -6,6 +6,7 @@ interface CreateLobbyResponse {
 interface IdMessageClient {
     name: string | null
     id: string | null
+    lobby: string
 }
 
 interface IdMessageServer {

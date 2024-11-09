@@ -5,8 +5,6 @@ const crypto = require('crypto');  // for generating random IDs
 const cors = require('cors');
 const fs = require('fs');
 
-const countries = require('./countries.json')
-
 function toPascalCase(str) {
     return str
         .split(/[-\s]+/)
@@ -16,8 +14,9 @@ function toPascalCase(str) {
         .join('');
 }
 
-const adjs = fs.readFileSync('./adjs.txt').toString().split("\n");
-const govts = fs.readFileSync('./govts.txt').toString().split("\n");
+const adjs = fs.readFileSync('./src/app/api/adjs.txt').toString().split("\n");
+const govts = fs.readFileSync('./src/app/api/govts.txt').toString().split("\n");
+const countries = JSON.parse(fs.readFileSync('./src/app/api/countries.json').toString());
 let names = adjs.flatMap(a => govts.map(g => a + " " + g))
 names = names.map(toPascalCase)
 
@@ -89,7 +88,7 @@ io.on('connection', (socket) => {
     console.log(`a user (${socket.id}) joined`);
 
     // handle joining a lobby
-    socket.on("ID", (name, lobbyId) => {
+    socket.on("ID", ({ name, lobby: lobbyId }) => {
         const lobby = lobbies[lobbyId];
         if (lobby) {
             const player = lobby.players.find((p) => p.username == name);
@@ -100,9 +99,11 @@ io.on('connection', (socket) => {
                     name: player.username,
                     team: player.team,
                     isMaster: player.id == lobby.masterId,
-                    players : getPlayersByTeam(lobby.players)
+                    players: lobby.players.map((p) => ({
+                        name: p.username,
+                        team: p.team,
+                    }))
                 });
-
                 console.log(`Player rejoined the lobby ${lobbyId} as ${player.username}`);
             } else {
                 const team = Math.round(Math.random());
@@ -116,7 +117,10 @@ io.on('connection', (socket) => {
                     name: newPlayer.username,
                     team: newPlayer.team,
                     isMaster: newPlayer.id == lobby.masterId,
-                    players : getPlayersByTeam(lobby.players)
+                    players: lobby.players.map((p) => ({
+                        name: p.username,
+                        team: p.team,
+                    }))
                 });
 
                 console.log(`Player joined the lobby ${lobbyId} as ${newPlayer.username}`);

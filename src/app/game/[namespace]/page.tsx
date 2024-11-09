@@ -16,21 +16,24 @@ export default function Game() {
     }
 
     const id = localStorage.getItem('id');
-    const name = localStorage.getItem('name');
+    const name = null //localStorage.getItem('name');
 
     const idReq: IdMessageClient = {
         id,
         name,
+        lobby: params.namespace as string,
     }
 
     socket.emit('ID', idReq)
+    console.log('emit', idReq)
 
     socket.on('ID', (res: IdMessageServer) => {
+      console.log('receive id')
       localStorage.setItem('id', res.id)
       localStorage.setItem('name', res.name)
       setPlayer({ name: res.name, team: res.team, isMaster: res.isMaster })
 
-      setPlayers(res.players.concat({ name: res.name, team: res.team }));
+      setPlayers(res.players);
     })
 
     socket.on('PLAYER_IN', (res: PlayerInMessageServer) => {
@@ -58,6 +61,8 @@ export default function Game() {
     return <p>Loading</p>
   }
 
+  console.log(players)
+
   return (
     <div className="flex flex-col items-center justify-center h-screen bg-background text-foreground gap-10">
       <h1 className="text-4xl font-bold">Lobby for game {params.namespace}</h1>
@@ -73,12 +78,19 @@ export default function Game() {
         <div>
           <h2 className="text-2xl font-bold">Team Blue</h2>
           <ul>
-            {players.filter((p) => p.team === 0).map((p, i) => (
+            {players.filter((p) => p.team === 1).map((p, i) => (
               <li key={i} className={p.name === player.name ? 'font-bold' : ''}>{p.name}</li>
             ))}
           </ul>
         </div>
       </div>
+      {
+        player.isMaster ?
+        <button>
+          start
+        </button>
+        : null
+      }
     </div>
   );
 }

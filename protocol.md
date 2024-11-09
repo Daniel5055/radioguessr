@@ -30,6 +30,7 @@ On joining a lobby, user connects to server socket and emits.
 {
     name: string,
     id: string
+    lobby: string
 }
 ```
 
