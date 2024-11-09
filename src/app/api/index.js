@@ -58,7 +58,7 @@ io.on('connection', (socket) => {
             } else {
                 const team = Math.round(Math.random());
                 const newPlayer = new Player(socket.id, 'Guest', team);
-                lobby.players.team.push(newPlayer);
+                lobby.players.push(newPlayer);
 
                 socket.join(lobbyId); // add player to the room
 
@@ -67,13 +67,17 @@ io.on('connection', (socket) => {
                     name: newPlayer.username,
                     team: newPlayer.team
                 });
-                
+
                 console.log(`Player joined the lobby ${lobbyId} as ${newPlayer.username}`);
             }
         } else {
             socket.disconnect(true);
         }
     });
+
+    socket.on("START", () => {
+        
+    })
 
     socket.on('disconnect', () => {
         // if user is lobby master, assign different
