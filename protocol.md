@@ -47,6 +47,10 @@ If joined successful, server sends back to the user
     id: string
     name: string
     team: number
+    players: {
+        name: string
+        team: string
+    }[]
 }
 ```
 
@@ -72,29 +76,8 @@ And the server sends the following message back
 ```ts
 "START"
 {
-    radio: string // url to starting station
-    id: number // radio id (used for navigation)
-}
-```
-
----
-
-Each user can send the following to change the radio station they are listening to
-
-```ts
-"TUNE"
-{
-    diff: number // How much to change the radio id by
-}
-```
-
-And the server will respond with a a new statio
-
-```ts
-"STATION"
-{
-    radio: string // url to starting station
-    id: number // radio id (used for navigation)
+    radio: string[] // All radio urls
+    start: number // Index of starting radio
 }
 ```
 

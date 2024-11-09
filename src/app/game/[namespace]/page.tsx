@@ -1,8 +1,12 @@
+"use client"
 
-export default function Game({ params: { namespace } }: { params: { namespace: string } }) {
+import { useParams } from "next/navigation";
+
+export default function Game() {
+  const params = useParams()
   return (
     <div className="flex flex-col items-center justify-center h-screen bg-background text-foreground gap-10">
-      <h1 className="text-4xl font-bold">Lobby for game {namespace}</h1>
+      <h1 className="text-4xl font-bold">Lobby for game {params.namespace}</h1>
       <div className="grid grid-cols-2 gap-4">
         <div>
           <h2 className="text-2xl font-bold">Team 1</h2>
