@@ -30,7 +30,6 @@ On joining a lobby, user connects to server socket and emits.
 {
     name: string,
     id: string
-    team: number
 }
 ```
 
@@ -46,12 +45,16 @@ If joined successful, server sends back to the user
 "ID" 
 {
     id: string
+    name: string
+    team: number
 }
 ```
 
 where id should be the same id as given by the user, or a new id if the user gave a null id.
 
 If the id is unrecognised, the server responds with a new id
+
+If the id is recognised, then send back the same id with same name and team
 
 ## Game Starting
 
