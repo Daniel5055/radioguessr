@@ -6,9 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "dev:server": "node src/app/api/index.js"
   },
   "dependencies": {
+    "cors": "^2.8.5",
     "express": "^4.21.1",
     "next": "15.0.3",
     "react": "19.0.0-rc-66855b96-20241106",

@@ -2,6 +2,25 @@ const express = require('express');
 const { createServer } = require('http');
 const { Server } = require('socket.io');
 const crypto = require('crypto');  // for generating random IDs
+const cors = require('cors')
+
+const app = express();
+app.use(cors({
+    origin: "*",
+}))
+const server = createServer(app);
+const io = new Server(server, {
+    cors: {
+        origin: "*",
+        methods: ["GET", "POST"]
+    }
+});
+
+server.listen(process.env.PORT ?? 8080, () => {
+    console.log(`listening on *:${process.env.PORT ?? 8080}`);
+});
+
+const lobbies = {}
 
 app.post('/create', (req, res) => {
     const lobbyId = crypto.randomBytes(4).toString('hex');
@@ -12,21 +31,8 @@ app.post('/create', (req, res) => {
     };
 
     res.json({
-        url: `/lobby/${lobbyId}`,
+        url: `/game/${lobbyId}`,
     });
-});
-
-const app = express();
-const server = createServer(app);
-const io = new Server(server, {
-    cors: {
-        origin: "*",
-        methods: ["GET", "POST"]
-    }
-});
-
-server.listen(process.env.PORT ?? 3000, () => {
-    console.log(`listening on *:${process.env.PORT ?? 3000}`);
 });
 
 class Player {
@@ -81,7 +87,7 @@ io.on('connection', (socket) => {
 
     socket.on('disconnect', () => {
         // if user is lobby master, assign different
-        console.log(`a user (${n.id}) disconnected`);
+        console.log(`a user (${socket.id}) disconnected`);
     })
 })
 
